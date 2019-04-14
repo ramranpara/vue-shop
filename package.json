@@ -8,9 +8,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "bootstrap": "^4.3.1",
     "core-js": "^2.6.5",
+    "firebase": "^5.9.3",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.15.0",
     "vue": "^2.6.6",
-    "vue-router": "^3.0.1"
+    "vue-firestore": "^0.3.21",
+    "vue-router": "^3.0.1",
+    "vue2-editor": "^2.6.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",
