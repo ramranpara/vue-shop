@@ -16,34 +16,42 @@
         <hr>
 
         <div class="product-test">
-          <div class="form-group">
-            <input type="text" placeholder="Product Name" v-model="product.name" class="form-control">
-          </div>
-          <div class="form-group">
-            <input type="text" placeholder="Price" v-model="product.price" class="form-control">
-          </div>
-          <div class="form-group">
-              <button @click="saveData" class="btn btn-primary">Save Data</button> 
-          </div>
-
+          
           <hr>
-          <h3>Product List</h3>
+          <h3 class="d-inline-block" >Product List</h3>
+          <button  @click="addNew" class="btn btn-primary float-right">Add New Product</button>
          <div class="table-responsive">
-          <table>
+          <table class="table">
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Description</th>
                   <th>Price</th>
+                  <th>Product Tags</th>
+                  <th>Image</th>
                   <th>Modify</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="product in products">
-                  <td>{{product.data().name}}</td>
-                  <td>{{product.data().price}}</td>
+                  <td>
+                    {{product.name}}
+                  </td>
+                  <td>
+                    {{product.desc}}
+                  </td>
+                  <td>
+                    {{product.price}}
+                  </td>
+                  <td>
+                    {{product.tag}}
+                  </td>
+                  <td>
+                    {{product.image}}
+                  </td>
                   <td>
                     <button @click="editProduct(product)" class="btn btn-primary">Edit</button>
-                    <button @click="deleteProduct(product.id)" class="btn btn-danger">Delete</button>
+                    <button @click="deleteProduct(product)" class="btn btn-danger">Delete</button>
                   </td>
                 </tr>
               </tbody>
@@ -53,7 +61,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="editLabel" aria-hidden="true">
+    <div class="modal fade" id="productNew" tabindex="-1" role="dialog" aria-labelledby="editLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -67,12 +75,22 @@
                 <input type="text" placeholder="Product Name" v-model="product.name" class="form-control">
               </div>
               <div class="form-group">
+                <input type="textarea" placeholder="Product Description" v-model="product.desc" class="form-control">
+              </div>
+              <div class="form-group">
                 <input type="text" placeholder="Price" v-model="product.price" class="form-control">
+              </div>
+              <div class="form-group">
+                <input type="text" placeholder="Product Tags" v-model="product.tag" class="form-control">
+              </div>
+              <div class="form-group">
+                <input type="file" @change="uploadImage()" placeholder=""  class="form-control">
               </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button @click="updateProduct()" type="button" class="btn btn-primary">Save changes</button>
+            <button @click="addProduct()" type="button" class="btn btn-primary" v-if="modal == 'new'">Save Product</button>
+            <button @click="updateProduct()" type="button" class="btn btn-primary" v-if="modal == 'edit'">Apply Changes</button>
           </div>
         </div>
       </div>
@@ -95,82 +113,89 @@ export default {
       products:[],
       product:{
       name:null,
-      price:null
+      desc:null,
+      price:null,
+      tag:null,
+      image:null
       },
-      activeItem:null
+      activeItem:null,
+      modal: null
+    }
+  },
+
+  firestore(){
+    return{ 
+      products: db.collection('products'),
     }
   },
 
   methods:{
-    watcher(){
-
-        db.collection("products").onSnapshot((querySnapshot) => {
-              products = [];
-              querySnapshot.forEach(function(doc) {
-                  products.push(doc);
-              });
-        });
+    uploadImage(){
 
     },
+    addNew(){
+      this.modal = 'new';
+       $('#productNew').modal('show');
+    },
+
+   
     updateProduct(){
-  
-        db.collection("products").doc(this.activeItem).update(this.product)
-          .then(() => {
-              $('#edit').modal('hide');
-              this.watcher();
-              console.log("Document successfully updated!");
-          })
-          .catch(function(error) {
-              // The document probably doesn't exist.
-              console.error("Error updating document: ", error);
-          });
+      this.$firestore.products.doc(this.product.id).update(this.product);
+      console.log(this.product.id);
+        Toast.fire({
+          type: 'success',
+          title: 'updated in successfully'
+        })
+        $('#productNew').modal('hide');
     },
-    editProduct(product){
 
-        $('#edit').modal('show');
-        this.product = product.data();
-        this.activeItem = product.id;
+    editProduct(product){
+        this.modal = 'edit';
+        this.product = product;
+        $('#productNew').modal('show'); 
     },
 
     deleteProduct(doc){
-      if(confirm('Are You Sure to Delete?')){
-        db.collection("products").doc(doc).delete().then(function() {
-            console.log("Document successfully deleted!");
-        }).catch(function(error) {
-            console.error("Error removing document: ", error);
-        });
-      }else{
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.value) {
+          this.$firestore.products.doc(doc['.key']).delete()
+          console.log(doc['.key']);
+            Toast.fire({
+              type: 'success',
+              title: 'deleted successfully'
+            })
+        
+        }
+      })
 
-      }
     },
     readData(){
-      db.collection("products").get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            this.products.push(doc);
-          });
-      });
+    
     },
 
-    saveData(){
-        db.collection("products").add(this.product)
-        .then((docRef) => {
-            console.log("Document written with ID: ", docRef.id);
-            this.readData();
-        })
-        .catch(function(error) {
-            console.error("Error adding document: ", error);
-        });
+    addProduct(){
+       this.$firestore.products.add(this.product);
+        $('#productNew').modal('hide');
+         Toast.fire({
+              type: 'success',
+              title: 'added in successfully'
+            })
     },
 
-    reset(){
-     // Object.assign(this.$data, this.$options.data.apply(this));
-    }
+   
 
   },
 
   created(){
-      this.readData();
+      
   }
 
 };
