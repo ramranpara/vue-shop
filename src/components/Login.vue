@@ -65,7 +65,7 @@
 
 <script>
 
-import {fb} from '../firebase';
+import {fb,db} from '../firebase';
 
 export default {
   name: "Login",
@@ -102,6 +102,18 @@ export default {
           fb.auth().createUserWithEmailAndPassword(this.email, this.password)
             .then((user) => {
                 $('#login').modal('hide');
+
+                    // Add a new document in collection "cities"
+                        db.collection("profile").doc(user.user.uid).set({
+                            name: this.name
+                        })
+                        .then(function() {
+                            console.log("Document successfully written!");
+                        })
+                        .catch(function(error) {
+                            console.error("Error writing document: ", error);
+                        });
+
                 this.$router.replace('admin');
             })
             .catch(function(error) {

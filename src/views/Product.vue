@@ -71,35 +71,41 @@
             </button>
           </div>
           <div class="modal-body">
-              <div class="form-group">
-                <input type="text" placeholder="Product Name" v-model="product.name" class="form-control">
-              </div>
-              <div class="form-group">
-                <vue-editor v-model="product.desc"></vue-editor>
-              </div>
-              <div class="form-group">
-                <input type="text" placeholder="Price" v-model="product.price" class="form-control">
-              </div>
-              <div class="form-group">
-                <input type="text" @keyup.188="addTag" placeholder="Product Tags" v-model="tag" class="form-control">
-                <div class="d-flex">
-                  <p v-for="tag in product.tags">
-                  <span>{{tag}}</span>
-                  </p>
-                </div>
-              </div>
-              <div class="form-group">
-                <input type="file" @change="uploadImage" >
-              </div>
-              <div class="form-group d-flex">
-                <div class="p-1" v-for="(image, index) in product.images">
-                  <div class="img-wrapp">
-                    <img :src="image" alt="" width="80px" >
-                    <span class="delete-img" @click="deleteImage(image,index)">X</span>
-                  </div>  
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                      <input type="text" placeholder="Product Name" v-model="product.name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <vue-editor v-model="product.desc"></vue-editor>
+                    </div>
                 </div>  
-              </div>
-              
+                <div class="col-md-4">  
+                    <div class="form-group">
+                      <input type="text" placeholder="Price" v-model="product.price" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <input type="text" @keyup.188="addTag" placeholder="Product Tags" v-model="tag" class="form-control">
+                        <div class="d-flex">
+                          <p v-for="tag in product.tags">
+                            <span class="p-1">{{tag}}</span>
+                          </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="product_image">Product Image</label>
+                      <input type="file" @change="uploadImage" class="form-control">
+                    </div>
+                    <div class="form-group d-flex">
+                      <div class="p-1" v-for="(image, index) in product.images">
+                        <div class="img-wrapp">
+                          <img :src="image" alt="" width="80px">
+                          <span class="delete-img" @click="deleteImage(image,index)">X</span>
+                        </div>  
+                      </div>  
+                    </div>
+                </div> 
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -119,12 +125,13 @@ import {fb, db} from '../firebase';
 
 export default {
   name: "Product",
-  props: {
-    msg: String
-  },
   components: {
     VueEditor
   },
+  props: {
+    msg: String
+  },
+  
 
   data(){
     return{
@@ -158,7 +165,7 @@ export default {
         console.log('image deleted');
       }).catch(function(){
         console.log('an error occured');
-      })
+      });
     },
 
     addTag(){
@@ -169,25 +176,25 @@ export default {
     uploadImage(e){
       if(e.target.files[0]){
         
-      let file = e.target.files[0];
-      console.log(e.target.files[0]); 
+        let file = e.target.files[0];
+        console.log(e.target.files[0]);  
 
-      var storageRef = fb.storage().ref('products/'+ file.name);
-      
-      let uploadTask = storageRef.put(file); 
-      
-        uploadTask.on('state_changed', (snapshot) => {
-      
-        }, (error) => {
-          // Handle unsuccessful uploads
-        }, () => {
-          // Handle successful uploads on complete
-          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-            this.product.images.push(downloadURL);
-            console.log('File available at', downloadURL);
+        var storageRef = fb.storage().ref('products/'+ Math.random() + '_' + file.name);
+        
+        let uploadTask = storageRef.put(file); 
+        
+          uploadTask.on('state_changed', (snapshot) => {
+        
+          }, (error) => {
+            // Handle unsuccessful uploads
+          }, () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+              this.product.images.push(downloadURL);
+              console.log('File available at', downloadURL);
+            });
           });
-        });
 
       }
 
@@ -195,11 +202,11 @@ export default {
 
     reset(){
       this.product = {
-         name:null,
-      desc:null,
-      price:null,
-      tags: [],
-      image:[]
+          name:null,
+          desc:null,
+          price:null,
+          tags: [],
+          images:[]
       }
     },
     addNew(){
@@ -237,9 +244,9 @@ export default {
       }).then((result) => {
         if (result.value) {
 
-          this.$firestore.products.doc(doc['.key']).delete()
+          this.$firestore.products.doc(doc.id).delete()
           
-          console.log(doc['.key']);
+          console.log(doc.id);
             Toast.fire({
               type: 'success',
               title: 'deleted successfully'
@@ -276,15 +283,15 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 
-img-wrapp{
+.img-wrapp{
   position: relative;
 }
-img-wrapp span.delete-img{
+.img-wrapp span.delete-img{
   position: absolute;
   top: -14px;
   left: -2px;
 }
-img-wrapp span.delete-img:hover{
+.img-wrapp span.delete-img:hover{
   cursor:pointer;
 }
 

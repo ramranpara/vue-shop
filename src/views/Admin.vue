@@ -22,7 +22,7 @@
                         <span class="user-name">Jhon
                             <strong>Smith</strong>
                         </span>
-                        <span class="user-role">Administrator</span>
+                        <span class="user-role">{{email}}</span>
                         <span class="user-status">
                             <i class="fa fa-circle"></i>
                             <span>Online</span>
@@ -48,7 +48,12 @@
                         <li class="header-menu">
                             <span>Menu</span>
                         </li>
-                        
+                        <li>
+                            <router-link to="/admin/profile">
+                                <i class="fa fa-user"></i>
+                                <span>Profile</span>
+                            </router-link>
+                        </li>
                         <li>
                             <router-link to="/admin/overview">
                                 <i class="fa fa-chart-line"></i>
@@ -67,6 +72,7 @@
                                 <span>Orders</span>
                             </router-link>
                         </li>
+
                         <li>
                             <a href="#" @click="logout()">
                                 <i class="fa fa-power-off"></i>
@@ -96,6 +102,11 @@ import {fb} from '../firebase';
 
 export default {
   name: "admin",
+  data(){
+      return{
+          name:null
+      }
+  },
   components: {
      Hero
   },
@@ -112,7 +123,13 @@ export default {
               console.log(err);
           })
       }
-  }
+  },
+
+    created(){
+        var user = fb.auth().currentUser;
+        this.email = user.email;
+    }
+
 };
 </script>
 
