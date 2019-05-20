@@ -15,6 +15,10 @@ Vue.use(VueFirestore, {
 Vue.use(VueFirestore);
 window.$ = window.jQuery = jQuery;
 
+import Vue2Filters from 'vue2-filters'
+ 
+Vue.use(Vue2Filters)
+
 import "popper.js";
 import "bootstrap";
 import "./assets/app.scss";
@@ -32,6 +36,14 @@ const Toast = Swal.mixin({
 window.Toast = Toast;
 
 Vue.component("Navbar", require("./components/Navbar.vue").default);
+Vue.component("ProductList", require("./sections/ProductList.vue").default);
+
+
+import VueCarousel from 'vue-carousel/dist/vue-carousel.min';
+
+Vue.use(VueCarousel);
+
+
 Vue.config.productionTip = false;
 
 let app = "";

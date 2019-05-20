@@ -3,6 +3,8 @@
     <Navbar></Navbar>
       <Hero/>
       <Products/>
+      
+      <ProductList/>
 
      
       <div class="container h-100">
@@ -28,12 +30,13 @@
 import Hero from "@/components/Hero.vue";
 import Products from "@/sections/Products.vue";
 import Login from "@/components/Login.vue";
+import ProductList from "@/sections/ProductList.vue";
 
 
 export default {
   name: "home",
   components: {
-     Hero,Products,Login
+     Hero,Products,Login,ProductList
   }
 };
 </script>
