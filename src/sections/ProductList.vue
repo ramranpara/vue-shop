@@ -7,7 +7,7 @@
               <div class="col-md-4" v-for="product in products">
                   <div class="card product-item">
                     
-                        <carousel :per-page="1" :autoplay="true" :loop="true" paginationActiveColor="#42b983" paginationColor="#b2ebd1" paginationSize="10" easing="linear" speed="300" >
+                        <carousel paginationActiveColor="#42b983" paginationColor="#b2ebd1" >
                             <slide v-for="(image, index) in product.images">
                                 <img :src="image" style="width:250px;" class="card-img-top" alt="...">
                             </slide>
@@ -20,7 +20,12 @@
                                 <h5 class="card-price">{{ product.price | currency }}</h5>
                             </div>    
                             
-                            <a href="#" class="btn btn-primary">Add to Cart</a>
+                            <add-to-cart
+                              :product-image="getImage(product.images)"
+                              :p-id="product.id"
+                              :price="product.price"
+                              :name="product.name">
+                            </add-to-cart>
                         </div>
                     </div>
               </div>
@@ -40,7 +45,7 @@ export default {
     msg: String
   },
 
-    data(){
+  data(){
     return{
       products:[],
       product:{
@@ -53,6 +58,11 @@ export default {
       activeItem:null,
       modal: null,
       tag:null
+    }
+  },
+  methods: {
+    getImage(images){
+      return images[0];
     }
   },
 
